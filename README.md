@@ -38,6 +38,7 @@ L'application s'ouvre dans le navigateur à l'adresse `http://localhost:8501`. P
 - Une tâche vide (ou composée uniquement d'espaces) n'est pas ajoutée.
 - Chaque tâche est précédée d'une **case à cocher** : cocher la case marque la tâche comme faite, la décocher annule.
 - Les tâches faites sont automatiquement **déplacées à la fin de la liste**, **barrées** et **grisées**. Une tâche décochée remonte parmi les tâches à faire.
+- Une **date et une heure limites** peuvent être ajoutées à une tâche (facultatif). Le **temps restant** s'affiche alors avant le libellé, par exemple « Il vous reste ⏳ 2 j 5 h pour : réviser ». Si l'échéance est dépassée, la **durée du retard** s'affiche en rouge, par exemple « ⚠️ En retard de 35 min : réviser ». Une tâche sans date affiche seulement son libellé. Si seule la date est renseignée, l'échéance est fixée à 23h59.
 
 ## Démarche de réalisation
 
@@ -46,6 +47,7 @@ L'application s'ouvre dans le navigateur à l'adresse `http://localhost:8501`. P
 1. Ajouter et afficher des tâches
 2. Cocher et décocher une tâche
 3. Rejeter les tâches faites en fin de liste, barrées et grisées
+4. Ajouter une date limite optionnelle et afficher le temps restant
 
 ### Étape 1 : ajouter et afficher des tâches
 
@@ -76,3 +78,28 @@ Pour que le tri soit correct dès le clic, le champ `fait` doit être mis à jou
 Avant l'affichage, la liste est triée avec `sorted(..., key=lambda t: t["fait"])` : comme `False` passe avant `True`, les tâches à faire s'affichent en premier et les tâches faites à la fin.
 
 Enfin, le libellé d'une tâche faite est entouré de `~~...~~` pour le barrer et de `:gray[...]` pour le griser.
+
+### Étape 4 : date limite et temps restant
+
+L'objectif de cette étape était de permettre à l'utilisateur d'ajouter, s'il le souhaite, une date et une heure limites à une tâche, et d'afficher le temps restant avant le libellé.
+
+**Saisie de l'échéance.** Deux champs ont été ajoutés au formulaire, côte à côte grâce à `st.columns(2)` : un `st.date_input` pour la date et un `st.time_input` pour l'heure. Ils sont créés avec `value=None`, ce qui les laisse vides par défaut : l'échéance reste ainsi facultative.
+
+**Enregistrement de l'échéance.** Au moment de l'ajout, si une date a été choisie, elle est assemblée avec l'heure grâce à `datetime.combine`. Sans heure précisée, on prend 23h59, c'est-à-dire la fin de la journée. L'échéance est ensuite stockée sous forme de texte avec `.isoformat()` (par exemple `"2026-10-15T18:00:00"`), car un objet `datetime` ne peut pas être enregistré directement au format JSON. Sans date, le champ vaut `None`. Le champ `echeance`, prévu depuis l'étape 1, est donc enfin utilisé.
+
+**Calcul du temps restant.** Deux fonctions ont été ajoutées :
+
+- `formater_duree(secondes)` convertit un nombre de secondes en un texte lisible (`2 j 5 h`, `3 h 10 min` ou `12 min`), à l'aide de la division entière `//` et du reste `%` ;
+- `temps_restant(echeance)` calcule la différence entre l'échéance et l'heure actuelle (`datetime.now()`). Si la durée est positive, elle renvoie le temps restant précédé de ⏳. Si elle est négative, l'échéance est dépassée : elle renvoie « ⚠️ En retard de … » en rouge, en passant `-secondes` à `formater_duree` pour obtenir une durée positive. Sans échéance, elle renvoie un texte vide.
+
+Le calcul en jours, heures et minutes servant à la fois pour le temps restant et pour le retard, il a été placé dans une fonction séparée pour ne pas répéter le code.
+
+**Affichage.** Pour chaque tâche à faire, trois cas sont distingués :
+
+| Situation | Affichage |
+|---|---|
+| Pas d'échéance | le libellé seul |
+| Échéance future | « Il vous reste ⏳ 18 h 12 min pour : faire la cuisine » |
+| Échéance dépassée | « ⚠️ En retard de 35 min : faire la cuisine » (en rouge) |
+
+Les tâches déjà faites n'affichent pas de compte à rebours. Le temps restant est recalculé à chaque relecture du fichier, c'est-à-dire à chaque interaction de l'utilisateur.
