@@ -1,7 +1,7 @@
 name: liste_taches
 channels:
-  - conda-forge
-  - defaults
+- conda-forge
+- defaults
 dependencies:
-  - python=3.12
-  - streamlit
+- python=3.12
+- streamlit

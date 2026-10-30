@@ -1,0 +1,37 @@
+{
+  "Ma liste": [],
+  "Cours": [
+    {
+      "id": "496d5650-5584-4b47-834b-975925f42202",
+      "libelle": "Analyse des données",
+      "fait": false,
+      "echeance": "2026-11-02T09:00:00"
+    },
+    {
+      "id": "0fcc62a6-55c9-4ff6-abf8-85d80386f6c4",
+      "libelle": "Python",
+      "fait": false,
+      "echeance": "2026-11-03T11:00:00"
+    }
+  ],
+  "Perso": [
+    {
+      "id": "72bd0a48-5e2c-4be7-9ce1-fea08cb51313",
+      "libelle": "Lavage",
+      "fait": false,
+      "echeance": "2026-11-08T10:00:00"
+    },
+    {
+      "id": "b70c2e41-8cbb-41da-a5bd-13185bd51cc0",
+      "libelle": "Restaurant",
+      "fait": false,
+      "echeance": null
+    },
+    {
+      "id": "671866be-73a8-4a17-871d-2e8eaa91b2d2",
+      "libelle": "Etude",
+      "fait": false,
+      "echeance": "2026-09-22T00:07:00"
+    }
+  ]
+}
